@@ -1,8 +1,9 @@
+/* eslint-disable valid-jsdoc */
 /* eslint-disable indent */
 /* eslint-disable object-curly-spacing */
 
-/** With plugin, routes is pure function **/
-const routes = (handler) = [
+/* With plugin, routes is pure function **/
+const routes = (handler) => [
   {
     method: 'POST',
     path: '/songs',

@@ -28,7 +28,7 @@ class SongsService {
 
   getSongs() {
     const songData = [];
-    this_songs.forEach((song) => {
+    this._songs.forEach((song) => {
       songData.push({
         'id': song.id,
         'title': song.title,
@@ -68,7 +68,7 @@ class SongsService {
     };
   }
 
-  deleteNoteById(id) {
+  deleteSongById(id) {
     const index = this._songs.findIndex((song) => song.id === id);
 
     if (index === -1) {
