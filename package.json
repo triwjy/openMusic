@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "eslint ./src",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "node-pg-migrate",
     "start": "nodemon ./src/server.js"
   },
   "keywords": [],
@@ -15,7 +16,9 @@
     "@hapi/hapi": "^20.1.4",
     "dotenv": "^10.0.0",
     "joi": "^17.4.0",
-    "nanoid": "^3.1.23"
+    "nanoid": "^3.1.23",
+    "node-pg-migrate": "^5.9.0",
+    "pg": "^8.6.0"
   },
   "devDependencies": {
     "eslint": "^7.29.0",
