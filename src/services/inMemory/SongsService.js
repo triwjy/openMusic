@@ -1,4 +1,6 @@
 const { nanoid } = require('nanoid');
+const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 // This service is responsible to manage resources (CRUD) in memory (array)
 class SongsService {
@@ -7,12 +9,15 @@ class SongsService {
   }
 
   addSong({ title, year, performer, genre, duration }) {
-    const id = nanoid(16);
-    const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
+    const id = 'song-' + nanoid(16);
+    const insertedAt = new Date().toISOString();
+    const updatedAt = insertedAt;
+    const numDuration = Number(duration);
+    const numYear = Number(year);
 
     const newSong = {
-      id, title, year, performer, genre, duration, createdAt, updatedAt,
+      // eslint-disable-next-line max-len
+      id, title, year: numYear, performer, genre, duration: numDuration, insertedAt, updatedAt,
     };
 
     this._songs.push(newSong);
@@ -20,7 +25,7 @@ class SongsService {
     const isSuccess = this._songs.filter((song) => song.id === id).length > 0;
 
     if (!isSuccess) {
-      throw new Error('Failed to add song');
+      throw new InvariantError('Failed to add song');
     }
 
     return id;
@@ -42,7 +47,7 @@ class SongsService {
     const song = this._songs.filter((s) => s.id === id)[0];
 
     if (!song) {
-      throw new Error('Song not found');
+      throw new NotFoundError('Song not found');
     }
 
     return song;
@@ -52,27 +57,29 @@ class SongsService {
     const index = this._songs.findIndex((s) => s.id === id);
 
     if (index === -1) {
-      throw new Error('Song not found');
+      throw new NotFoundError('Song not found');
     }
 
     const updatedAt = new Date().toISOString();
+    const numYear = Number(year);
+    const numDuration = Number(duration);
 
     this._songs[index] = {
       ...this._songs[index],
       title,
-      year,
+      year: numYear,
       performer,
       genre,
-      duration,
+      duration: numDuration,
       updatedAt,
     };
   }
 
   deleteSongById(id) {
-    const index = this._songs.findIndex((song) => song.id === id);
+    const index = this._songs.findIndex((s) => s.id === id);
 
     if (index === -1) {
-      throw new Error('Song not found');
+      throw new NotFoundError('Song not found');
     }
 
     this._songs.splice(index, 1);

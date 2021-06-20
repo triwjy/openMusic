@@ -1,7 +1,10 @@
+const ClientError = require('../../exceptions/ClientError');
+
 /* eslint-disable max-len */
 class SongsHandler {
-  constructor(service) {
+  constructor(service, validator) {
     this._service = service;
+    this._validator = validator;
 
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
@@ -12,6 +15,8 @@ class SongsHandler {
 
   postSongHandler(request, h) {
     try {
+      this._validator.validateSongPayload(request.payload);
+
       const { title, year, performer, genre, duration } = request.payload;
 
       const songId = this._service.addSong({ title, year, performer, genre, duration });
@@ -23,14 +28,25 @@ class SongsHandler {
           songId,
         },
       });
+
       response.code(201);
       return response;
     } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+      // Server error
       const response = h.response({
-        status: 'fail',
-        message: error.message,
+        status: 'error',
+        message: 'Sorry, error occured',
       });
-      response.code(400);
+      console.error(error);
+      response.code(500);
       return response;
     }
   }
@@ -48,8 +64,8 @@ class SongsHandler {
 
   getSongByIdHandler(request, h) {
     try {
-      const { id } = request.params;
-      const song = this._service.getSongById(id);
+      const { songId } = request.params;
+      const song = this._service.getSongById(songId);
       return {
         status: 'success',
         data: {
@@ -57,48 +73,83 @@ class SongsHandler {
         },
       };
     } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server error
       const response = h.response({
-        status: 'fail',
-        message: error.message,
+        status: 'error',
+        message: 'Sorry, error occured',
       });
-      response.code(404);
+      response.code(500);
+      console.error(error);
       return response;
     }
   }
 
   putSongByIdHandler(request, h) {
     try {
-      const { id } = request.params;
-      this._service.editSongById(id, request.payload);
+      this._validator.validateSongPayload(request.payload);
+
+      const { songId } = request.params;
+      this._service.editSongById(songId, request.payload);
       return {
         status: 'success',
         message: 'lagu berhasil diperbarui',
       };
     } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server error
       const response = h.response({
-        status: 'fail',
-        message: error.message,
+        status: 'error',
+        message: 'Sorry, error occured',
       });
-      response.code(404);
+      response.code(500);
+      console.error(error);
       return response;
     }
   }
 
   deleteSongByIdHandler(request, h) {
     try {
-      const { id } = request.params;
-      this._service.deleteNoteById(id);
+      const { songId } = request.params;
+      this._service.deleteSongById(songId);
 
       return {
         status: 'success',
         message: 'lagu berhasil dihapus',
       };
     } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server error
       const response = h.response({
-        status: 'fail',
-        message: error.message,
+        status: 'error',
+        message: 'Sorry, error occured',
       });
-      response.code(404);
+      response.code(500);
+      console.error(error);
       return response;
     }
   }
