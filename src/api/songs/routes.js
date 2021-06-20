@@ -1,38 +1,33 @@
+/* eslint-disable valid-jsdoc */
 /* eslint-disable indent */
 /* eslint-disable object-curly-spacing */
-const {
-  addSongHandler,
-  getAllSongsHandler,
-  getSongByIdHandler,
-  editSongByIdHandler,
-  deleteSongByIdHandler,
-  } = require('../src/handler');
 
-const routes = [
+/* With plugin, routes is pure function **/
+const routes = (handler) => [
   {
     method: 'POST',
     path: '/songs',
-    handler: addSongHandler,
+    handler: handler.postSongHandler,
   },
   {
     method: 'GET',
     path: '/songs',
-    handler: getAllSongsHandler,
+    handler: handler.getSongsHandler,
   },
   {
     method: 'GET',
     path: '/songs/{songId}',
-    handler: getSongByIdHandler,
+    handler: handler.getSongByIdHandler,
   },
   {
     method: 'PUT',
     path: '/songs/{songId}',
-    handler: editSongByIdHandler,
+    handler: handler.putSongByIdHandler,
   },
   {
     method: 'DELETE',
     path: '/songs/{songId}',
-    handler: deleteSongByIdHandler,
+    handler: handler.deleteSongByIdHandler,
   },
 ];
 
