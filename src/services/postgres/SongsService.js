@@ -3,7 +3,7 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const { mapDBToModel, mapDBToModelAllSongs } = require('../../utils');
+const { mapDBToModel } = require('../../utils');
 
 class SongsService {
   constructor() {
@@ -30,8 +30,9 @@ class SongsService {
   }
 
   async getSongs() {
-    const result = await this._pool.query('SELECT * FROM songs');
-    return result.rows.map(mapDBToModelAllSongs);
+    const query = 'SELECT id, title, performer FROM songs';
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 
   async getSongById(id) {
@@ -42,7 +43,7 @@ class SongsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Cannot find song by that id');
     }
 
@@ -58,7 +59,7 @@ class SongsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Cannot find song by that id');
     }
   }
@@ -71,7 +72,7 @@ class SongsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Cannot find song by that id');
     };
   };
