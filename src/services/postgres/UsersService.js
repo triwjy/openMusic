@@ -75,6 +75,7 @@ class UsersService {
       throw new AuthenticationError('Wrong Credential');
     }
 
+    // user-xxxx
     return id;
   }
 }
