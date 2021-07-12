@@ -6,8 +6,9 @@ const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
 class PlaylistsService {
-  constructor() {
+  constructor(collaborationService) {
     this._pool = new Pool();
+    this._collaborationService = collaborationService;
   }
 
   async addPlaylist({ name, owner }) {
@@ -34,7 +35,8 @@ class PlaylistsService {
       FROM playlists as pl 
       INNER JOIN 
       users ON pl.owner = users.id
-      WHERE pl.owner = $1`,
+      LEFT JOIN collaborations on pl.id = collaborations.playlist_id
+      WHERE pl.owner = $1 OR collaborations.user_id = $1`,
       values: [owner],
     };
     const result = await this._pool.query(query);
@@ -103,7 +105,7 @@ class PlaylistsService {
       throw new InvariantError('Cannot find song by that id');
     };
   };
-
+  // only accept owner id
   async verifyPlaylistOwner(playlistId, owner) {
     const query = {
       text: 'SELECT * FROM playlists WHERE id = $1',
@@ -118,9 +120,24 @@ class PlaylistsService {
 
     const playlist = result.rows[0];
 
-    console.log(playlist);
     if (playlist.owner !== owner) {
       throw new AuthorizationError('You are not authorized to access this resource');
+    }
+  }
+
+  // can be owner or collaborator id
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      try {
+        await this._collaborationService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
     }
   }
 }
