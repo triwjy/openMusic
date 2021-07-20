@@ -52,13 +52,22 @@ class SongsHandler {
   }
 
   async getSongsHandler() {
-    const songsData = await this._service.getSongs();
+    try {
+      const songsData = await this._service.getSongs();
 
-    return {
-      status: 'success',
-      data: {
-        songs: songsData,
-      },
+      return {
+        status: 'success',
+        data: {
+          songs: songsData,
+        },
+      };
+    } catch (error) {
+      const response = h.response({
+        status: 'error',
+        message: 'Sorry, error occured',
+      });
+      response.code(500);
+      return response;
     };
   }
 
