@@ -2,3 +2,4 @@
 *.env
 *.pem
 src/api/uploads/file
+README.md
